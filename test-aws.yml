@@ -14,3 +14,11 @@
     - name: Show the private key
       debug:
         msg: "{{ key_output.key.private_key }}"
+      when: key_output is changed   
+
+    - name: Save private key to file
+      copy:
+        content: "{{ key_output.key.private_key }}"
+        dest: "./sample-key.pem"
+        mode: '0600'
+      when: key_output is changed  
