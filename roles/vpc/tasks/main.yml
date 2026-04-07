@@ -29,5 +29,5 @@
 
 - name: Debug public subnet IDs
   debug:
-    msg: "Public subnet created: {{ item.subnet.id }} ({{ item.cidr }} - {{ item.availability_zone }})"
+    msg: "Public subnet created: {{ item.subnet.id }}"
   loop: "{{ pubsub_out.results }}"
