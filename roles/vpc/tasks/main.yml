@@ -18,7 +18,7 @@
   amazon.aws.ec2_vpc_subnet:
     vpc_id: "{{ vpc_out.vpc.id }}"
     cidr: "{{ item.cidr }}" #each item in the list of public_subnets
-    availability_zone: "{{ item.az }}"
+    az: "{{ item.az }}"
     region: "{{ region }}"
     map_public: true
     tags:
