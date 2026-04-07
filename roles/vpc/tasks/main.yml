@@ -10,7 +10,7 @@
     tenancy: default
     tags:
       Name: "{{ vpc_name }}"
-      Environment: "{{ environment }}"
+      Environment: "{{ env }}"
       ManagedBy: ansible
   register: vpc_out
 
