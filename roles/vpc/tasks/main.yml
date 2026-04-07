@@ -14,6 +14,6 @@
       ManagedBy: ansible
   register: vpc_out
 
-- name: Debug VPC output
-  ansible.builtin.debug:
-    var: vpc_out.vpc.id
+- name: Debug VPC output (full structure)
+  debug:
+    var: vpc_out
