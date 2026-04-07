@@ -1,6 +1,6 @@
 # VPC Default Configuration
 # These values can be overridden in group_vars or via --extra-vars
-
+vpc_name: "vprofile-vpc"
 vpc_cidr: "172.20.0.0/16"
 
 public_subnets:

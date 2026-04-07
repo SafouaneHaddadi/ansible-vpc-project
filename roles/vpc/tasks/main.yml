@@ -1,8 +1,4 @@
 ---
-- name: Set VPC name dynamically
-  set_fact:
-    vpc_name: "{{ project }}-vpc"
-
 - name: Create VPC
   amazon.aws.ec2_vpc_net:
     name: "{{ vpc_name }}"
@@ -17,7 +13,6 @@
       Environment: "{{ environment }}"
       ManagedBy: ansible
   register: vpc_out
-
 
 - name: Debug VPC output
   ansible.builtin.debug:
