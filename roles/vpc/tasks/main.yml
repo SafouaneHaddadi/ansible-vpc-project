@@ -1,0 +1,19 @@
+---
+- name: Create VPC
+  amazon.aws.ec2_vpc_net:
+    name: "{{ vpc_name }}"
+    cidr_block: "{{ vpc_cidr }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    dns_support: true
+    dns_hostnames: true
+    tenancy: default
+    tags:
+      Name: "{{ vpc_name }}"
+      Environment: "{{ environment }}"
+      ManagedBy: ansible
+  register: vpc_out
+
+- name: Debug VPC output
+  ansible.builtin.debug:
+    var: vpc_out.vpc.id
