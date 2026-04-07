@@ -1,0 +1,17 @@
+---
+- name: Warm up - Create EC2 Key Pair
+  hosts: localhost
+  connection: local
+  gather_facts: false 
+
+  tasks:
+    - name: Create a new EC2 key pair
+      amazon.aws.ec2_key:
+        name: sample-key
+        region: us-east-1
+        wait: true
+      register: key_output
+
+    - name: Show the private key
+      debug:
+        msg: "{{ key_output.key.private_key }}"
