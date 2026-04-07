@@ -1,0 +1,5 @@
+# Variables shared across the whole project
+region: "us-east-1"
+state: "present"
+environment: "dev"
+project: "vprofile"
