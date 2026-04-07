@@ -14,6 +14,20 @@
       ManagedBy: ansible
   register: vpc_out
 
-- name: Debug VPC output (full structure)
+- name: Create public subnets
+  amazon.aws.ec2_vpc_subnet:
+    vpc_id: "{{ vpc_out.vpc.id }}"
+    cidr: "{{ item.cidr }}" #each item in the list of public_subnets
+    availability_zone: "{{ item.az }}"
+    region: "{{ region }}"
+    map_public: true
+    tags:
+      Name: "{{ item.name }}"
+      Type: public
+  loop: "{{ public_subnets }}"
+  register: pubsub_out
+
+- name: Debug public subnet IDs
   debug:
-    var: vpc_out
+    msg: "Public subnet created: {{ item.subnet.id }} ({{ item.cidr }} - {{ item.availability_zone }})"
+  loop: "{{ pubsub_out.results }}"
