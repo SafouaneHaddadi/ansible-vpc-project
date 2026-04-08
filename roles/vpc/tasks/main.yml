@@ -83,6 +83,25 @@
     if_exist_do_not_create: true
   register: nat_gateway_out
 
-- name: Debug NAT Gateway (full output)
+#- name: Debug NAT Gateway (full output)
+ # debug:
+  #  var: nat_gateway_out
+
+- name: Create private route table
+  amazon.aws.ec2_vpc_route_table:
+    vpc_id: "{{ vpc_out.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    tags:
+      Name: "{{ vpc_name }}-private-rt"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+    subnets: "{{ privsub_out.results | map(attribute='subnet.id') | list }}"
+    routes:
+      - dest: 0.0.0.0/0
+        nat_gateway_id: "{{ nat_gateway_out.nat_gateway_id }}"
+  register: private_rt_out
+
+- name: Debug private route table
   debug:
-    var: nat_gateway_out
+    msg: "Private route table ID: {{ private_rt_out.route_table.id }}"
