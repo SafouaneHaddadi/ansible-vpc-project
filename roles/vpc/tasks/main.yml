@@ -54,3 +54,22 @@
       Type: private
   loop: "{{ private_subnets }}"
   register: privsub_out
+
+- name: Create public route table
+  amazon.aws.ec2_vpc_route_table:
+    vpc_id: "{{ vpc_out.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    tags:
+      Name: "{{ vpc_name }}-public-rt"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+    subnets: "{{ pubsub_out.results | map(attribute='subnet.id') | list }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw_out.gateway_id }}"
+  register: public_rt_out
+
+- name: Debug public route table
+  debug:
+    msg: "Public route table ID: {{ public_rt_out.route_table.id }}"
