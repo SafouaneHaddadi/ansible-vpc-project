@@ -102,6 +102,30 @@
         nat_gateway_id: "{{ nat_gateway_out.nat_gateway_id }}"
   register: private_rt_out
 
-- name: Debug private route table
-  debug:
-    msg: "Private route table ID: {{ private_rt_out.route_table.id }}"
+# store dynamic info in SSM Parameter Store for later use by other roles/playbooks
+- name: Store dynamic VPC info in SSM Parameter Store 
+  community.aws.ssm_parameter:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    string_type: String
+    region: "{{ region }}"
+    state: present
+    overwrite_value: always
+    tags:
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+      Project: "{{ project }}"
+  loop:
+    - { name: "/{{ project }}/{{ env }}/vpc/id", value: "{{ vpc_out.vpc.id }}" }
+    
+    - { name: "/{{ project }}/{{ env }}/subnets/public", value: "{{ pubsub_out.results | map(attribute='subnet.id') | join(',') }}" }
+    - { name: "/{{ project }}/{{ env }}/subnets/private", value: "{{ privsub_out.results | map(attribute='subnet.id') | join(',') }}" }
+    
+    - { name: "/{{ project }}/{{ env }}/igw/id", value: "{{ igw_out.gateway_id }}" }
+    
+    - { name: "/{{ project }}/{{ env }}/route_tables/public/id", value: "{{ public_rt_out.route_table.id }}" }
+    - { name: "/{{ project }}/{{ env }}/route_tables/private/id", value: "{{ private_rt_out.route_table.id }}" }
+    
+    - { name: "/{{ project }}/{{ env }}/nat/id", value: "{{ nat_gateway_out.nat_gateway_id }}" }
+    - { name: "/{{ project }}/{{ env }}/nat/public_ip", value: "{{ nat_gateway_out.nat_gateway_addresses[0].public_ip }}" }
+  when: state == "present" #only store parameters when creating/updating resources, not when deleting
