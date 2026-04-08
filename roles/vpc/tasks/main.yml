@@ -73,3 +73,18 @@
 - name: Debug public route table
   debug:
     msg: "Public route table ID: {{ public_rt_out.route_table.id }}"
+
+- name: Create NAT Gateway in public subnet
+  amazon.aws.ec2_vpc_nat_gateway:
+    subnet_id: "{{ pubsub_out.results[0].subnet.id }}" # using the first public subnet for NAT Gateway
+    region: "{{ region }}"
+    state: present
+    wait: true
+    if_exist_do_not_create: true
+  register: nat_gateway_out
+
+- name: Debug NAT Gateway 
+  debug:
+    msg:
+      - "NAT GW ID: {{ nat_gateway_out.nat_gateway_id }}"
+      - "Elastic IP allocated to NAT: {{ nat_gateway_out.nat_gateway.public_ip }}"
