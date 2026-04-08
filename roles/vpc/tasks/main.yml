@@ -83,8 +83,6 @@
     if_exist_do_not_create: true
   register: nat_gateway_out
 
-- name: Debug NAT Gateway
+- name: Debug NAT Gateway (full output)
   debug:
-    msg:
-      - "NAT GW ID: {{ nat_gateway_out.nat_gateway_id }}"
-      - "Elastic IP allocated to NAT: {{ nat_gateway_out.public_ip }}"
+    var: nat_gateway_out
