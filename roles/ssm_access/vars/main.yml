@@ -1,0 +1,9 @@
+ssm_instance_profile_name: "vprofile-ssm-role"
+ssm_instance_type: "t3.micro"
+ssm_ami: "ami-0ea87431b78a82070" 
+ssm_sg_name: "vprofile-ssm-sg"
+
+
+
+
+

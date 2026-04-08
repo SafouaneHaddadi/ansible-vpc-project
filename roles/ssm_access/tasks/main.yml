@@ -1,0 +1,27 @@
+- name: Get VPC info from SSM
+  set_fact: # store VPC info in ansible facts for use in this playbook
+    vpc_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/vpc/id', region='us-east-1') }}"
+    private_subnet_ids: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/subnets/private', region='us-east-1').split(',') }}" 
+
+- name: Create security group for SSM-managed instance
+  amazon.aws.ec2_security_group:
+    name: "{{ ssm_sg_name }}"
+    description: "No inbound - SSM access only"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules: []  #  meaning no one can initiate connections to this instance, only outbound
+    rules_egress: # SSM needs to talk to AWS endpoints
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: "0.0.0.0/0" 
+        rule_desc: "HTTPS for SSM Agent"
+    tags:
+      Name: "{{ ssm_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: ssm_sg_out
+
+- name: Debug SSM security group
+  var: ssm_sg_out
