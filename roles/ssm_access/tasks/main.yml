@@ -24,4 +24,5 @@
   register: ssm_sg_out
 
 - name: Debug SSM security group
-  var: ssm_sg_out
+  debug:
+    var: ssm_sg_out
