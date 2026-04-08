@@ -23,6 +23,26 @@
       ManagedBy: ansible
   register: ssm_sg_out
 
-- name: Debug SSM security group
+- name: Launch private EC2 instance with SSM access
+  amazon.aws.ec2_instance:
+    name: "{{ project }}-ssm-instance"
+    image_id: "{{ ssm_ami }}"
+    instance_type: "{{ ssm_instance_type }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    wait: true
+    subnet_id: "{{ private_subnet_ids[0] }}" 
+    security_group: "{{ ssm_sg_out.group_id }}"
+    iam_instance_profile: "{{ ssm_instance_profile_name }}"
+    network:
+      assign_public_ip: false
+    tags:
+      Name: "{{ project }}-ssm-instance"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+      Access: ssm-only
+  register: ec2_out
+
+- name: Debug instance
   debug:
-    var: ssm_sg_out
+    var: ec2_out
