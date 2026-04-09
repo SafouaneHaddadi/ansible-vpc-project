@@ -165,3 +165,37 @@
     msg:
       - "RabbitMQ instance ID: {{ rabbitmq_out.instances[0].instance_id }}"
       - "RabbitMQ private IP: {{ rabbitmq_out.instances[0].private_ip_address }}"
+
+# STORE ALL INSTANCE IDs AND PRIVATE IPS IN SSM 
+- name: Store all instance IDs and private IPs in SSM
+  community.aws.ssm_parameter:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    string_type: String
+    region: "{{ region }}"
+    state: present
+    overwrite_value: always
+    tags:
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  loop:
+    - { name: "/{{ project }}/{{ env }}/compute/nginx_id", value: "{{ nginx_out.instances[0].instance_id }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/nginx_ip", value: "{{ nginx_out.instances[0].private_ip_address }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/tomcat_id", value: "{{ tomcat_out.instances[0].instance_id }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/tomcat_ip", value: "{{ tomcat_out.instances[0].private_ip_address }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/mysql_id", value: "{{ mysql_out.instances[0].instance_id }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/mysql_ip", value: "{{ mysql_out.instances[0].private_ip_address }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/memcache_id", value: "{{ memcache_out.instances[0].instance_id }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/memcache_ip", value: "{{ memcache_out.instances[0].private_ip_address }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/rabbitmq_id", value: "{{ rabbitmq_out.instances[0].instance_id }}" }
+    - { name: "/{{ project }}/{{ env }}/compute/rabbitmq_ip", value: "{{ rabbitmq_out.instances[0].private_ip_address }}" }
+
+- name: Debug all instance private IPs
+  debug:
+    msg:
+      - "All EC2 instances created and stored in SSM"
+      - "Nginx:     {{ nginx_out.instances[0].private_ip_address }}"
+      - "Tomcat:    {{ tomcat_out.instances[0].private_ip_address }}"
+      - "MySQL:     {{ mysql_out.instances[0].private_ip_address }}"
+      - "Memcached: {{ memcache_out.instances[0].private_ip_address }}"
+      - "RabbitMQ:  {{ rabbitmq_out.instances[0].private_ip_address }}"
