@@ -11,3 +11,36 @@
       - "VPC ID: {{ vpc_id }}"
       - "Public subnet IDs: {{ public_subnet_ids }}"
       - "Private subnet IDs: {{ private_subnet_ids }}"
+
+# LOAD BALANCER SECURITY GROUP 
+- name: Create Load Balancer security group
+  amazon.aws.ec2_security_group:
+    name: "{{ alb_sg_name }}"
+    description: "ALB security group - HTTP/HTTPS from internet"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: 80 # the ALB can receive web traffic from the internet
+        to_port: 80
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "HTTP from anywhere"
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "HTTPS from anywhere"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ alb_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: alb_sg
+
+- name: Debug ALB security group ID
+  debug:
+    var: alb_sg

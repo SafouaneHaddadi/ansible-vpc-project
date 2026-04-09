@@ -16,3 +16,4 @@ rabbitmq_mgmt_port: 15672
 
 alb_name: "{{ vpc_name }}-alb"
 target_group_name: "{{ vpc_name }}-nginx-tg"
+alb_sg_name: "{{ vpc_name }}-alb-sg"
