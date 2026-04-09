@@ -1,0 +1,4 @@
+---
+- ansible.builtin.import_tasks: security_groups.yml
+- ansible.builtin.import_tasks: ec2_instances.yml
+- ansible.builtin.import_tasks: load_balancer.yml

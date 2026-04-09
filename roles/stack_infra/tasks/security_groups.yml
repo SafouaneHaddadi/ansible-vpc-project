@@ -1,0 +1,13 @@
+---
+- name: Fetch VPC and subnet IDs from SSM
+  set_fact:
+    vpc_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/vpc/id', region='us-east-1') }}"
+    public_subnet_ids: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/subnets/public', region='us-east-1').split(',') }}"
+    private_subnet_ids: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/subnets/private', region='us-east-1').split(',') }}"
+
+- name: Debug fetched IDs
+  debug:
+    msg:
+      - "VPC ID: {{ vpc_id }}"
+      - "Public subnet IDs: {{ public_subnet_ids }}"
+      - "Private subnet IDs: {{ private_subnet_ids }}"
