@@ -19,3 +19,30 @@
       - "Memcached SG ID: {{ memcache_sg_id }}"
       - "RabbitMQ SG ID: {{ rabbitmq_sg_id }}"
 
+# LAUNCH NGINX EC2 
+- name: Launch Nginx EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ nginx_name }}"
+    image_id: "{{ ubuntu_ami }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    state: present
+    wait: true
+    subnet_id: "{{ private_subnet_ids[0] }}"
+    security_group: "{{ nginx_sg_id }}"
+    iam_instance_profile: "vprofile-ssm-role"
+    network:
+      assign_public_ip: false
+    tags:
+      Name: "{{ nginx_name }}"
+      Role: nginx
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: nginx_out
+
+- name: Debug Nginx EC2 creation
+  debug:
+    msg:
+      - "Nginx instance ID: {{ nginx_out.instances[0].instance_id }}"
+      - "Nginx private IP: {{ nginx_out.instances[0].private_ip_address }}"
+      - "Nginx subnet: {{ nginx_out.instances[0].subnet_id }}"
