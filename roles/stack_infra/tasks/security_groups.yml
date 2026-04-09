@@ -181,3 +181,30 @@
 - name: Debug RabbitMQ security group ID
   debug:
     msg: "RabbitMQ SG created: {{ rabbitmq_sg.group_id }}"
+
+# STORE SECURITY GROUP IDs IN SSM 
+- name: Store security group IDs in SSM Parameter Store
+  community.aws.ssm_parameter:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    string_type: String
+    region: "{{ region }}"
+    state: present
+    overwrite_value: always
+    tags:
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  loop:
+    - { name: "/{{ project }}/{{ env }}/sg/alb_sg_id",       value: "{{ alb_sg.group_id }}" }
+    - { name: "/{{ project }}/{{ env }}/sg/nginx_sg_id",     value: "{{ nginx_sg.group_id }}" }
+    - { name: "/{{ project }}/{{ env }}/sg/tomcat_sg_id",    value: "{{ tomcat_sg.group_id }}" }
+    - { name: "/{{ project }}/{{ env }}/sg/mysql_sg_id",     value: "{{ mysql_sg.group_id }}" }
+    - { name: "/{{ project }}/{{ env }}/sg/memcache_sg_id",  value: "{{ memcache_sg.group_id }}" }
+    - { name: "/{{ project }}/{{ env }}/sg/rabbitmq_sg_id",  value: "{{ rabbitmq_sg.group_id }}" }
+  when: state == "present" # only store in SSM if we actually created/updated the SGs 
+
+- name: Debug - stored SG IDs
+  debug: 
+    msg:
+      - "Security group IDs stored in SSM under /{{ project }}/{{ env }}/sg/"
+      - "Example: /{{ project }}/{{ env }}/sg/alb_sg_id = {{ alb_sg.group_id }}"
