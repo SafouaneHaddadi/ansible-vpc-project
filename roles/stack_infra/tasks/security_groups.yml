@@ -65,6 +65,86 @@
       ManagedBy: ansible
   register: nginx_sg
 
-- name: Debug Nginx security group ID
+# TOMCAT SECURITY GROUP 
+- name: Create Tomcat security group
+  amazon.aws.ec2_security_group:
+    name: "{{ tomcat_sg_name }}"
+    description: "Tomcat SG - port 8080 from Nginx only"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: "{{ tomcat_port }}"
+        to_port: "{{ tomcat_port }}"
+        group_id: "{{ nginx_sg.group_id }}"
+        rule_desc: "App traffic from Nginx only"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ tomcat_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: tomcat_sg
+
+- name: Debug Tomcat security group ID
   debug:
-    msg: "Nginx SG created: {{ nginx_sg.group_id }}"
+    msg: "Tomcat SG created: {{ tomcat_sg.group_id }}"
+
+# MYSQL SECURITY GROUP 
+- name: Create MySQL security group
+  amazon.aws.ec2_security_group:
+    name: "{{ mysql_sg_name }}"
+    description: "MySQL SG - port 3306 from Tomcat only"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: "{{ mysql_port }}"
+        to_port: "{{ mysql_port }}"
+        group_id: "{{ tomcat_sg.group_id }}"
+        rule_desc: "MySQL access from Tomcat only"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ mysql_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: mysql_sg
+
+- name: Debug MySQL security group ID
+  debug:
+    msg: "MySQL SG created: {{ mysql_sg.group_id }}"
+
+# MEMCACHED SECURITY GROUP 
+- name: Create Memcached security group
+  amazon.aws.ec2_security_group:
+    name: "{{ memcache_sg_name }}"
+    description: "Memcached SG - port 11211 from Tomcat only"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: "{{ memcache_port }}"
+        to_port: "{{ memcache_port }}"
+        group_id: "{{ tomcat_sg.group_id }}"
+        rule_desc: "Memcached access from Tomcat only"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ memcache_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: memcache_sg
+
+- name: Debug Memcached security group ID
+  debug:
+    msg: "Memcached SG created: {{ memcache_sg.group_id }}"

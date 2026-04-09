@@ -21,3 +21,6 @@ target_group_name: "{{ vpc_name }}-nginx-tg"
 alb_sg_name: "{{ vpc_name }}-alb-sg"
 
 nginx_sg_name: "{{ vpc_name }}-nginx-sg"
+tomcat_sg_name: "{{ vpc_name }}-tomcat-sg"
+mysql_sg_name: "{{ vpc_name }}-mysql-sg"
+memcache_sg_name: "{{ vpc_name }}-memcache-sg"
