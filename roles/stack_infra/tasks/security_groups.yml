@@ -41,6 +41,30 @@
       ManagedBy: ansible
   register: alb_sg
 
-- name: Debug ALB security group ID
+# NGINX SECURITY GROUP
+- name: Create Nginx security group
+  amazon.aws.ec2_security_group:
+    name: "{{ nginx_sg_name }}"
+    description: "Nginx SG - HTTP only from ALB"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: "{{ nginx_port }}"
+        to_port: "{{ nginx_port }}"
+        group_id: "{{ alb_sg.group_id }}"
+        rule_desc: "HTTP from ALB only"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ nginx_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: nginx_sg
+
+- name: Debug Nginx security group ID
   debug:
-    var: alb_sg
+    msg: "Nginx SG created: {{ nginx_sg.group_id }}"
