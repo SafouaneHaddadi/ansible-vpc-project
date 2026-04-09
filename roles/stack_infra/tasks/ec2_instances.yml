@@ -31,8 +31,10 @@
     subnet_id: "{{ private_subnet_ids[0] }}"
     security_group: "{{ nginx_sg_id }}"
     iam_instance_profile: "vprofile-ssm-role"
-    network:
-      assign_public_ip: false
+    network_interfaces:                    
+      - assign_public_ip: false            
+        delete_on_termination: true        
+        device_index: 0                    
     tags:
       Name: "{{ nginx_name }}"
       Role: nginx
