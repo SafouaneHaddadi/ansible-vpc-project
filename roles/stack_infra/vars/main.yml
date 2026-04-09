@@ -1,0 +1,18 @@
+ubuntu_ami: "ami-0ec10929233384c7f"
+instance_type: "t3.micro"
+
+nginx_name: "{{ vpc_name }}-nginx"
+tomcat_name: "{{ vpc_name }}-tomcat"
+memcache_name: "{{ vpc_name }}-memcache"
+rabbitmq_name: "{{ vpc_name }}-rabbitmq"
+mysql_name: "{{ vpc_name }}-mysql"
+
+nginx_port: 80
+tomcat_port: 8080
+mysql_port: 3306
+memcache_port: 11211
+rabbitmq_port: 5672
+rabbitmq_mgmt_port: 15672
+
+alb_name: "{{ vpc_name }}-alb"
+target_group_name: "{{ vpc_name }}-nginx-tg"
