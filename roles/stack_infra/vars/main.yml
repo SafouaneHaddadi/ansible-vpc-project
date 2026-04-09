@@ -1,3 +1,5 @@
+vpc_name: "vprofile-vpc"
+
 ubuntu_ami: "ami-0ec10929233384c7f"
 instance_type: "t3.micro"
 
