@@ -48,3 +48,120 @@
       - "Nginx instance ID: {{ nginx_out.instances[0].instance_id }}"
       - "Nginx private IP: {{ nginx_out.instances[0].private_ip_address }}"
       - "Nginx subnet: {{ nginx_out.instances[0].subnet_id }}"
+
+
+# LAUNCH TOMCAT EC2 
+- name: Launch Tomcat EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ tomcat_name }}"
+    image_id: "{{ ubuntu_ami }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    state: present
+    wait: true
+    subnet_id: "{{ private_subnet_ids[0] }}"
+    security_group: "{{ tomcat_sg_id }}"
+    iam_instance_profile: "vprofile-ssm-role"
+    network_interfaces:
+      - assign_public_ip: false
+        delete_on_termination: true
+        device_index: 0
+    tags:
+      Name: "{{ tomcat_name }}"
+      Role: tomcat
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: tomcat_out
+
+- name: Debug Tomcat EC2 creation
+  debug:
+    msg:
+      - "Tomcat instance ID: {{ tomcat_out.instances[0].instance_id }}"
+      - "Tomcat private IP: {{ tomcat_out.instances[0].private_ip_address }}"
+
+# AUNCH MYSQL EC2 
+- name: Launch MySQL EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ mysql_name }}"
+    image_id: "{{ ubuntu_ami }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    state: present
+    wait: true
+    subnet_id: "{{ private_subnet_ids[1] }}"
+    security_group: "{{ mysql_sg_id }}"
+    iam_instance_profile: "vprofile-ssm-role"
+    network_interfaces:
+      - assign_public_ip: false
+        delete_on_termination: true
+        device_index: 0
+    tags:
+      Name: "{{ mysql_name }}"
+      Role: mysql
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: mysql_out
+
+- name: Debug MySQL EC2 creation
+  debug:
+    msg:
+      - "MySQL instance ID: {{ mysql_out.instances[0].instance_id }}"
+      - "MySQL private IP: {{ mysql_out.instances[0].private_ip_address }}"
+
+# LAUNCH MEMCACHED EC2
+- name: Launch Memcached EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ memcache_name }}"
+    image_id: "{{ ubuntu_ami }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    state: present
+    wait: true
+    subnet_id: "{{ private_subnet_ids[1] }}"
+    security_group: "{{ memcache_sg_id }}"
+    iam_instance_profile: "vprofile-ssm-role"
+    network_interfaces:
+      - assign_public_ip: false
+        delete_on_termination: true
+        device_index: 0
+    tags:
+      Name: "{{ memcache_name }}"
+      Role: memcache
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: memcache_out
+
+- name: Debug Memcached EC2 creation
+  debug:
+    msg:
+      - "Memcached instance ID: {{ memcache_out.instances[0].instance_id }}"
+      - "Memcached private IP: {{ memcache_out.instances[0].private_ip_address }}"
+
+# LAUNCH RABBITMQ EC2 
+- name: Launch RabbitMQ EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ rabbitmq_name }}"
+    image_id: "{{ ubuntu_ami }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    state: present
+    wait: true
+    subnet_id: "{{ private_subnet_ids[1] }}"
+    security_group: "{{ rabbitmq_sg_id }}"
+    iam_instance_profile: "vprofile-ssm-role"
+    network_interfaces:
+      - assign_public_ip: false
+        delete_on_termination: true
+        device_index: 0
+    tags:
+      Name: "{{ rabbitmq_name }}"
+      Role: rabbitmq
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: rabbitmq_out
+
+- name: Debug RabbitMQ EC2 creation
+  debug:
+    msg:
+      - "RabbitMQ instance ID: {{ rabbitmq_out.instances[0].instance_id }}"
+      - "RabbitMQ private IP: {{ rabbitmq_out.instances[0].private_ip_address }}"
