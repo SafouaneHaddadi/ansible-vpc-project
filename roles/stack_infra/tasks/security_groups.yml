@@ -148,3 +148,36 @@
 - name: Debug Memcached security group ID
   debug:
     msg: "Memcached SG created: {{ memcache_sg.group_id }}"
+
+# RABBITMQ SECURITY GROUP 
+- name: Create RabbitMQ security group
+  amazon.aws.ec2_security_group:
+    name: "{{ rabbitmq_sg_name }}"
+    description: "RabbitMQ SG - ports 5672 and 15672 from Tomcat only"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    rules:
+      - proto: tcp
+        from_port: "{{ rabbitmq_port }}"
+        to_port: "{{ rabbitmq_port }}"
+        group_id: "{{ tomcat_sg.group_id }}"
+        rule_desc: "AMQP from Tomcat only"
+      - proto: tcp
+        from_port: "{{ rabbitmq_mgmt_port }}"
+        to_port: "{{ rabbitmq_mgmt_port }}"
+        group_id: "{{ tomcat_sg.group_id }}"
+        rule_desc: "Management UI from Tomcat only"
+    rules_egress:
+      - proto: all
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "Allow all outbound"
+    tags:
+      Name: "{{ rabbitmq_sg_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: rabbitmq_sg
+
+- name: Debug RabbitMQ security group ID
+  debug:
+    msg: "RabbitMQ SG created: {{ rabbitmq_sg.group_id }}"
