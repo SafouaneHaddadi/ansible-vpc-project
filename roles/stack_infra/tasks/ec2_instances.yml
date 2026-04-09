@@ -1,0 +1,21 @@
+---
+# FETCH ALL IDs FROM SSM
+- name: Fetch private subnet IDs and all security group IDs from SSM
+  set_fact:
+    private_subnet_ids: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/subnets/private', region='us-east-1').split(',') }}"
+    nginx_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/nginx_sg_id', region='us-east-1') }}"
+    tomcat_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/tomcat_sg_id', region='us-east-1') }}"
+    mysql_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/mysql_sg_id', region='us-east-1') }}"
+    memcache_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/memcache_sg_id', region='us-east-1') }}"
+    rabbitmq_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/rabbitmq_sg_id', region='us-east-1') }}"
+
+- name: Debug fetched IDs
+  debug:
+    msg:
+      - "Private subnet IDs: {{ private_subnet_ids }}"
+      - "Nginx SG ID: {{ nginx_sg_id }}"
+      - "Tomcat SG ID: {{ tomcat_sg_id }}"
+      - "MySQL SG ID: {{ mysql_sg_id }}"
+      - "Memcached SG ID: {{ memcache_sg_id }}"
+      - "RabbitMQ SG ID: {{ rabbitmq_sg_id }}"
+
