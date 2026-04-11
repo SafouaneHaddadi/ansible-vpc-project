@@ -38,6 +38,29 @@
       ManagedBy: ansible
   register: target_group
 
-- name: Debug target group
+# CREATE APPLICATION LOAD BALANCER 
+- name: Create Application Load Balancer
+  amazon.aws.elb_application_lb:
+    name: "{{ alb_name }}"
+    region: "{{ region }}"
+    state: present
+    scheme: internet-facing
+    subnets: "{{ public_subnet_ids }}"
+    security_groups:
+      - "{{ alb_sg_id }}"
+    listeners:
+      - Protocol: HTTP
+        Port: 80
+        DefaultActions:
+          - Type: forward
+            TargetGroupName: "{{ target_group_name }}"
+    tags:
+      Name: "{{ alb_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: alb
+
+- name: Debug ALB DNS
   debug:
-    var: target_group
+    msg:
+      - "DNS name: {{ alb.dns_name }}"
