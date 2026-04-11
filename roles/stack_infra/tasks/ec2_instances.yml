@@ -26,7 +26,7 @@
     image_id: "{{ ubuntu_ami }}"
     instance_type: "{{ instance_type }}"
     region: "{{ region }}"
-    state: present
+    state: running
     wait: true
     subnet_id: "{{ private_subnet_ids[0] }}"
     security_group: "{{ nginx_sg_id }}"
@@ -57,7 +57,7 @@
     image_id: "{{ ubuntu_ami }}"
     instance_type: "{{ instance_type }}"
     region: "{{ region }}"
-    state: present
+    state: running
     wait: true
     subnet_id: "{{ private_subnet_ids[0] }}"
     security_group: "{{ tomcat_sg_id }}"
@@ -86,7 +86,7 @@
     image_id: "{{ ubuntu_ami }}"
     instance_type: "{{ instance_type }}"
     region: "{{ region }}"
-    state: present
+    state: running
     wait: true
     subnet_id: "{{ private_subnet_ids[1] }}"
     security_group: "{{ mysql_sg_id }}"
@@ -115,7 +115,7 @@
     image_id: "{{ ubuntu_ami }}"
     instance_type: "{{ instance_type }}"
     region: "{{ region }}"
-    state: present
+    state: running
     wait: true
     subnet_id: "{{ private_subnet_ids[1] }}"
     security_group: "{{ memcache_sg_id }}"
@@ -144,7 +144,7 @@
     image_id: "{{ ubuntu_ami }}"
     instance_type: "{{ instance_type }}"
     region: "{{ region }}"
-    state: present
+    state: running
     wait: true
     subnet_id: "{{ private_subnet_ids[1] }}"
     security_group: "{{ rabbitmq_sg_id }}"
