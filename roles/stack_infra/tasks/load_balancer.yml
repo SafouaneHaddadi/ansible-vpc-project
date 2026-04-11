@@ -12,3 +12,32 @@
       - "ALB SG ID: {{ alb_sg_id }}"
       - "Nginx instance ID: {{ nginx_instance_id }}"
       - "Public subnet IDs: {{ public_subnet_ids }}"
+
+# CREATE TARGET GROUP 
+- name: Create target group for Nginx and register instance
+  community.aws.elb_target_group:
+    name: "{{ target_group_name }}"
+    protocol: http
+    port: "{{ nginx_port }}"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    state: present
+    target_type: instance
+    health_check_protocol: http
+    health_check_path: /
+    health_check_interval: 30
+    health_check_timeout: 5
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 3
+    targets:
+      - Id: "{{ nginx_instance_id }}"
+        Port: "{{ nginx_port }}"
+    tags:
+      Name: "{{ target_group_name }}"
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+  register: target_group
+
+- name: Debug target group
+  debug:
+    var: target_group
