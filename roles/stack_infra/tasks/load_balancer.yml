@@ -1,0 +1,14 @@
+---
+# FETCH IDs FROM SSM 
+- name: Fetch ALB SG ID, Nginx instance ID, and public subnet IDs from SSM
+  set_fact:
+    alb_sg_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/sg/alb_sg_id', region='us-east-1') }}"
+    nginx_instance_id: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/nginx_id', region='us-east-1') }}"
+    public_subnet_ids: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/subnets/public', region='us-east-1').split(',') }}"
+
+- name: Debug fetched IDs
+  debug:
+    msg:
+      - "ALB SG ID: {{ alb_sg_id }}"
+      - "Nginx instance ID: {{ nginx_instance_id }}"
+      - "Public subnet IDs: {{ public_subnet_ids }}"
