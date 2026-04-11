@@ -60,7 +60,18 @@
       ManagedBy: ansible
   register: alb
 
-- name: Debug ALB DNS
+- name: Store ALB DNS name in SSM
+  community.aws.ssm_parameter:
+    name: "/{{ project }}/{{ env }}/alb/dns_name"
+    value: "{{ alb.dns_name }}"
+    string_type: String
+    region: "{{ region }}"
+    state: present
+    overwrite_value: always
+    tags:
+      Environment: "{{ env }}"
+      ManagedBy: ansible
+
+- name: Debug SSM storage
   debug:
-    msg:
-      - "DNS name: {{ alb.dns_name }}"
+    msg: "ALB DNS stored in SSM: /{{ project }}/{{ env }}/alb/dns_name = {{ alb.dns_name }}"
