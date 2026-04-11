@@ -13,6 +13,16 @@
       - "Nginx instance ID: {{ nginx_instance_id }}"
       - "Public subnet IDs: {{ public_subnet_ids }}"
 
+- name: Wait for Nginx EC2 to be in running state
+  amazon.aws.ec2_instance_info:
+    instance_ids:
+      - "{{ nginx_instance_id }}"
+    region: "{{ region }}"
+  register: nginx_status
+  until: nginx_status.instances[0].state.name == "running" 
+  retries: 30
+  delay: 10
+
 # CREATE TARGET GROUP 
 - name: Create target group for Nginx and register instance
   community.aws.elb_target_group:
