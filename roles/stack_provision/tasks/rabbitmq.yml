@@ -14,24 +14,19 @@
     update_cache: yes
   become: true
 
-#for verifying the authenticity of packages 
-- name: Add RabbitMQ signing key
-  ansible.builtin.apt_key:
-    url: "https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc"
-    state: present
-  become: true
-
-- name: Add RabbitMQ apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://ppa1.novemberain.com/rabbitmq/v3.12/deb/ubuntu jammy main"
-    state: present
+- name: Add RabbitMQ official repository
+  ansible.builtin.shell: |
+    curl -1sLf "https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey" | gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq-archive-keyring.gpg > /dev/null
+    echo "deb [signed-by=/usr/share/keyrings/rabbitmq-archive-keyring.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ jammy main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+    apt-get update -q
+  args:
+    creates: /etc/apt/sources.list.d/rabbitmq.list
   become: true
 
 - name: Install RabbitMQ server
   ansible.builtin.apt:
     name: rabbitmq-server
     state: present
-    update_cache: yes
   become: true
 
 - name: Start and enable RabbitMQ
