@@ -9,7 +9,7 @@
     - ansible.builtin.import_tasks: roles/stack_provision/tasks/fetch_artifacts.yml
 
 - name: Provision MySQL
-  hosts: mysql
+  hosts: _mysql
   become: true
   gather_facts: true
   vars_files:
