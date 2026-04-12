@@ -1,0 +1,33 @@
+---
+- name: Install build dependencies on control node
+  ansible.builtin.apt:
+    name:
+      - git
+      - default-jdk
+      - maven
+    state: present
+    update_cache: true
+  become: true
+  delegate_to: localhost
+
+- name: Clone vprofile application source code
+  ansible.builtin.git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_build_dir }}"
+    version: "{{ app_branch }}"
+    force: true
+  delegate_to: localhost
+
+- name: Build artifact with Maven
+  ansible.builtin.command:
+    cmd: mvn clean install -DskipTests
+    chdir: "{{ app_build_dir }}"
+  delegate_to: localhost
+  register: mvn_output
+
+- name: Debug Maven build output
+  ansible.builtin.debug:
+    var: mvn_output.stdout_lines
+  delegate_to: localhost
+
+

@@ -1,0 +1,6 @@
+app_repo: "https://github.com/devopshydclub/vprofile-project.git"
+app_branch: "vp-rem"
+app_build_dir: "/tmp/vprofile-repo"
+artifact_staging_dir: "/tmp/artifacts"
+artifact_name: "ROOT.war"
+sql_name: "db_backup.sql" 

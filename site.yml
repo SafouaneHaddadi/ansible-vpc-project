@@ -1,0 +1,11 @@
+---
+- name: Phase 3 - Build artifact
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - roles/stack_provision/vars/main.yml
+
+  roles:
+    - stack_provision
