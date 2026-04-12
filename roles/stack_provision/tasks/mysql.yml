@@ -1,10 +1,9 @@
 ---
 - name: Fetch MySQL secrets from AWS Secrets Manager
   set_fact:
-    mysql_secret: "{{ lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') }}"
-    db_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_pass }}"
-    db_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_user }}"
-    db_name: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_name }}"
+    db_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_pass }}"
+    db_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_user }}"
+    db_name: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_name }}"
 
 - name: Install MySQL server and dependencies
   ansible.builtin.apt:
