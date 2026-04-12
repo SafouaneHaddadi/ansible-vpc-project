@@ -10,3 +10,9 @@
     name: memcached
     state: restarted
   become: true
+
+- name: restart rabbitmq
+  ansible.builtin.service:
+    name: rabbitmq-server
+    state: restarted
+  become: true

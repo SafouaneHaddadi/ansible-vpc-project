@@ -1,0 +1,70 @@
+---
+- name: Fetch RabbitMQ secrets from AWS Secrets Manager
+  set_fact:
+    rmq_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_pass }}"
+    rmq_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_user }}"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: yes
+  become: true
+
+#for verifying the authenticity of packages 
+- name: Add RabbitMQ signing key
+  ansible.builtin.apt_key:
+    url: "https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc"
+    state: present
+  become: true
+
+- name: Add RabbitMQ apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://ppa1.novemberain.com/rabbitmq/v3.12/deb/ubuntu jammy main"
+    state: present
+  become: true
+
+- name: Install RabbitMQ server
+  ansible.builtin.apt:
+    name: rabbitmq-server
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Start and enable RabbitMQ
+  ansible.builtin.service:
+    name: rabbitmq-server
+    state: started
+    enabled: yes
+  become: true
+
+- name: Allow RabbitMQ to accept non-localhost connections
+  ansible.builtin.copy:
+    content: |
+      [{rabbit, [{loopback_users, []}]}].
+    dest: /etc/rabbitmq/rabbitmq.config
+    mode: '0644'
+  become: true
+  notify: restart rabbitmq # call handler to restart RabbitMQ after config change
+#note : Even though RabbitMQ listens on 0.0.0.0, only Tomcat instances can connect to it. This provides multi-layered security 
+
+- name: Create RabbitMQ application user
+  community.rabbitmq.rabbitmq_user:
+    user: "{{ rmq_user }}"
+    password: "{{ rmq_pass }}"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  become: true
+
+- name: Enable RabbitMQ management plugin
+  community.rabbitmq.rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+  become: true
+  notify: restart rabbitmq
