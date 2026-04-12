@@ -1,0 +1,24 @@
+---
+- name: Create staging directory
+  ansible.builtin.file:
+    path: "{{ artifact_staging_dir }}"
+    state: directory
+  delegate_to: localhost
+
+- name: Download WAR from S3
+  amazon.aws.s3_object:
+    bucket: "{{ artifact_bucket }}"
+    object: "{{ artifact_key_war }}"
+    dest: "{{ artifact_staging_dir }}/{{ artifact_name }}"
+    mode: get
+    region: "{{ artifact_region }}"
+  delegate_to: localhost
+
+- name: Download SQL dump from S3
+  amazon.aws.s3_object:
+    bucket: "{{ artifact_bucket }}"
+    object: "{{ artifact_key_sql }}"
+    dest: "{{ artifact_staging_dir }}/{{ sql_name }}"
+    mode: get
+    region: "{{ artifact_region }}"
+  delegate_to: localhost

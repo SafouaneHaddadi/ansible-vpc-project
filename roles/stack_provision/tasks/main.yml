@@ -1,2 +1,2 @@
 ---
-- ansible.builtin.import_tasks: build.yml
+- ansible.builtin.import_tasks: fetch_artifacts.yml

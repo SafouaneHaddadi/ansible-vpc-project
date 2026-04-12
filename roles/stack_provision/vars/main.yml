@@ -1,6 +1,10 @@
-app_repo: "https://github.com/devopshydclub/vprofile-project.git"
-app_branch: "vp-rem"
-app_build_dir: "/tmp/vprofile-repo"
+# S3 bucket configuration 
+artifact_bucket: "vprofile-artifacts-12345"   
+artifact_region: "us-east-1"
+artifact_key_war: "ROOT.war"
+artifact_key_sql: "db_backup.sql"
+
+# Local staging directory 
 artifact_staging_dir: "/tmp/artifacts"
 artifact_name: "ROOT.war"
-sql_name: "db_backup.sql" 
+sql_name: "db_backup.sql"
