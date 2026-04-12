@@ -1,11 +1,20 @@
 ---
-- name: Phase 3 - Build artifact
+- name: Fetch artifacts from S3
   hosts: localhost
   connection: local
   gather_facts: false
-
   vars_files:
     - roles/stack_provision/vars/main.yml
+  tasks:
+    - ansible.builtin.import_tasks: roles/stack_provision/tasks/fetch_artifacts.yml
 
-  roles:
-    - stack_provision
+- name: Provision MySQL
+  hosts: mysql
+  become: true
+  gather_facts: true
+  vars_files:
+    - roles/stack_provision/vars/main.yml
+  tasks:
+    - ansible.builtin.import_tasks: roles/stack_provision/tasks/mysql.yml
+  handlers:
+    - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml

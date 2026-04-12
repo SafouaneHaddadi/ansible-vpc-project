@@ -1,0 +1,63 @@
+---
+- name: Fetch MySQL secrets from AWS Secrets Manager
+  set_fact:
+    mysql_secret: "{{ lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') }}"
+    db_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_pass }}"
+    db_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_user }}"
+    db_name: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql') | from_json).db_name }}"
+
+- name: Install MySQL server and dependencies
+  ansible.builtin.apt:
+    name:
+      - mysql-server
+      - mysql-client
+      - python3-mysqldb
+      - libmysqlclient-dev
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Start and enable MySQL service
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: yes
+  become: true
+
+- name: Configure MySQL to listen on all interfaces
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0' 
+    backup: yes 
+  become: true 
+  notify: restart mysql # call handler to restart MySQL after config change
+
+- name: Create application database
+  community.mysql.mysql_db:
+    name: "{{ db_name }}"
+    state: present
+  become: true
+
+- name: Create database user with privileges
+  community.mysql.mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_pass }}"
+    priv: "{{ db_name }}.*:ALL" # grant all privileges on the application database to this user
+    host: "%" # allow access from any host but the SG should restrict it to the app server
+    state: present
+  become: true
+
+- name: Copy SQL dump from staging to remote instance 
+  ansible.builtin.copy:
+    src: "{{ artifact_staging_dir }}/{{ sql_name }}" 
+    dest: /tmp/db_backup.sql 
+    mode: '0644' #owner can read/write, group can read, others can read
+  become: true
+
+- name: Import SQL dump into accounts database 
+  community.mysql.mysql_db:
+    name: "{{ db_name }}"
+    state: import
+    target: /tmp/db_backup.sql
+  become: true
