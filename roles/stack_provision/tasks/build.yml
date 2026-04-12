@@ -25,9 +25,27 @@
   delegate_to: localhost
   register: mvn_output
 
-- name: Debug Maven build output
-  ansible.builtin.debug:
-    var: mvn_output.stdout_lines
+#- name: Debug Maven build output
+ # ansible.builtin.debug:
+  #  var: mvn_output.stdout_lines
+ # delegate_to: localhost
+
+- name: Create staging directory
+  ansible.builtin.file:
+    path: "{{ artifact_staging_dir }}"   
+    state: directory
   delegate_to: localhost
 
+- name: Copy WAR to staging folder
+  ansible.builtin.copy:
+    src: "{{ app_build_dir }}/target/vprofile-v2.war"
+    dest: "{{ artifact_staging_dir }}/{{ artifact_name }}"
+    remote_src: true
+  delegate_to: localhost
 
+- name: Copy SQL file to staging folder 
+  ansible.builtin.copy:
+    src: "{{ app_build_dir }}/src/main/resources/db_backup.sql"
+    dest: "{{ artifact_staging_dir }}/{{ sql_name }}"
+    remote_src: true
+  delegate_to: localhost
