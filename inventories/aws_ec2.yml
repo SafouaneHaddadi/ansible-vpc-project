@@ -11,11 +11,13 @@ filters:
 keyed_groups:
   - key: tags.Role
     prefix: ""
-    separator: ""
 
 hostnames:
-  - private-ip-address
+  - instance-id
 
 compose:
-  ansible_host: private_ip_address
-  ansible_aws_ssm_instance_id: instance_id 
+  ansible_host: instance_id
+
+vars:
+  ansible_connection: amazon.aws.aws_ssm
+  ansible_aws_ssm_region: us-east-1
