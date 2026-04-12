@@ -3,3 +3,8 @@ region: "us-east-1"
 state: "present"
 env: "dev"
 project: "vprofile"
+
+# Force SSM connection for all hosts (overrides inventory defaults)
+ansible_connection: community.aws.aws_ssm
+ansible_aws_ssm_region: us-east-1
+ansible_python_interpreter: /usr/bin/python3
