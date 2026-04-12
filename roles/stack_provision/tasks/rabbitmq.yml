@@ -4,29 +4,11 @@
     rmq_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_pass }}"
     rmq_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_user }}"
 
-- name: Install required packages
-  ansible.builtin.apt:
-    name:
-      - curl
-      - gnupg
-      - apt-transport-https
-    state: present
-    update_cache: yes
-  become: true
-
-- name: Add RabbitMQ official repository
-  ansible.builtin.shell: |
-    curl -1sLf "https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey" | gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq-archive-keyring.gpg > /dev/null
-    echo "deb [signed-by=/usr/share/keyrings/rabbitmq-archive-keyring.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ jammy main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
-    apt-get update -q
-  args:
-    creates: /etc/apt/sources.list.d/rabbitmq.list
-  become: true
-
-- name: Install RabbitMQ server
+- name: Install RabbitMQ server 
   ansible.builtin.apt:
     name: rabbitmq-server
     state: present
+    update_cache: yes
   become: true
 
 - name: Start and enable RabbitMQ
