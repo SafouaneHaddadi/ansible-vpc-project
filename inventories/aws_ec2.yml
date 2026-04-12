@@ -1,0 +1,21 @@
+# Hey AWS, tell me what servers exist, group them by role, then connect using SSM and run my tasks
+
+plugin: amazon.aws.aws_ec2 
+regions:
+  - us-east-1
+
+filters:
+  tag:Environment: dev
+  instance-state-name: running
+
+keyed_groups:
+  - key: tags.Role 
+    prefix: "" 
+
+hostnames: # Ansible asks AWS : "for each EC2, what should i call this host?" 
+  - private-ip-address 
+
+compose: # How do i connect to that host?
+  ansible_host: private_ip_address 
+
+ansible_connection: amazon.aws.aws_ssm 
