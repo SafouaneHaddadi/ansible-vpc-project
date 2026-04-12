@@ -4,3 +4,9 @@
     name: mysql
     state: restarted
   become: true
+
+- name: restart memcached
+  ansible.builtin.service:
+    name: memcached
+    state: restarted
+  become: true

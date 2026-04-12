@@ -18,3 +18,14 @@
     - ansible.builtin.import_tasks: roles/stack_provision/tasks/mysql.yml
   handlers:
     - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml
+
+- name: Provision Memcached
+  hosts: _memcache
+  become: true
+  gather_facts: true
+  vars_files:
+    - roles/stack_provision/vars/main.yml
+  tasks:
+    - ansible.builtin.import_tasks: roles/stack_provision/tasks/memcache.yml
+  handlers:
+    - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml
