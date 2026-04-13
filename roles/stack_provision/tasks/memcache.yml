@@ -6,6 +6,13 @@
     update_cache: yes
   become: true
 
+- name: Remove -d daemonize flag from config (incompatible with systemd)
+  ansible.builtin.lineinfile:
+    path: /etc/memcached.conf
+    regexp: '^-d$'
+    state: absent
+  become: true
+  
 - name: Start and enable Memcached
   ansible.builtin.service:
     name: memcached
