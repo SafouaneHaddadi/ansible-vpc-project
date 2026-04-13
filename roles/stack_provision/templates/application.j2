@@ -1,6 +1,6 @@
 # JDBC Configuration (MySQL)
 jdbc.driverClassName=com.mysql.jdbc.Driver
-jdbc.url=jdbc:mysql://{{ mysql_ip }}:3306/{{ db_name }}?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+jdbc.url=jdbc:mysql://{{ mysql_ip }}:3306/{{ db_name }}?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
 jdbc.username={{ db_user }}
 jdbc.password={{ db_pass }}
 
