@@ -23,7 +23,7 @@
     update_cache: yes
   become: true
 
-- name: Create tomcat system group
+- name: Create tomcat system group 
   ansible.builtin.group:
     name: tomcat
     state: present
@@ -64,9 +64,9 @@
     group: tomcat
   become: true
 
-- name: Create systemd service file for Tomcat 
+- name: Create systemd service file for Tomcat
   ansible.builtin.template:
-    src: tomcat.service.j2
+    src: "{{ playbook_dir }}/roles/stack_provision/templates/tomcat.service.j2"
     dest: /etc/systemd/system/tomcat.service
     mode: '0644'
   become: true
@@ -84,9 +84,9 @@
     enabled: yes
   become: true
 
-- name: Deploy application properties from template 
+- name: Deploy application properties from template
   ansible.builtin.template:
-    src: application.j2
+    src: "{{ playbook_dir }}/roles/stack_provision/templates/application.j2"
     dest: "{{ tomcat_home }}/webapps/ROOT/WEB-INF/classes/application.properties"
     mode: '0644'
     owner: tomcat
