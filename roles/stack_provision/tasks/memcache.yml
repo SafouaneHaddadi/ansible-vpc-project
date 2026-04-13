@@ -20,7 +20,7 @@
   args:
     executable: /bin/bash
   become: true
-  changed_when: fals
+  changed_when: false
 
 - name: Start and enable Memcached
   ansible.builtin.service:
