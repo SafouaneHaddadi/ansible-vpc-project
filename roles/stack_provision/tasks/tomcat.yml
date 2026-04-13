@@ -77,11 +77,28 @@
     daemon_reload: true
   become: true
 
+- name: Deploy ROOT.war artifact 
+  ansible.builtin.copy:
+    src: "{{ artifact_staging_dir }}/{{ artifact_name }}"
+    dest: "{{ tomcat_home }}/webapps/ROOT.war"
+    owner: tomcat
+    group: tomcat
+    mode: '0644'
+  become: true
+  notify: restart tomcat
+
 - name: Start and enable Tomcat
   ansible.builtin.service:
     name: tomcat
     state: started
     enabled: yes
+  become: true
+
+- name: Wait for Tomcat to deploy the WAR
+  ansible.builtin.wait_for:
+    path: "{{ tomcat_home }}/webapps/ROOT/WEB-INF/classes"
+    state: present
+    timeout: 60
   become: true
 
 - name: Deploy application properties from template
@@ -91,15 +108,5 @@
     mode: '0644'
     owner: tomcat
     group: tomcat
-  become: true
-  notify: restart tomcat
-
-- name: Deploy ROOT.war artifact 
-  ansible.builtin.copy:
-    src: "{{ artifact_staging_dir }}/{{ artifact_name }}"
-    dest: "{{ tomcat_home }}/webapps/ROOT.war"
-    owner: tomcat
-    group: tomcat
-    mode: '0644'
   become: true
   notify: restart tomcat
