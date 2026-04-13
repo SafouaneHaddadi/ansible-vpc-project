@@ -16,3 +16,9 @@
     name: rabbitmq-server
     state: restarted
   become: true
+
+- name: restart tomcat
+  ansible.builtin.service:
+    name: tomcat
+    state: restarted
+  become: true

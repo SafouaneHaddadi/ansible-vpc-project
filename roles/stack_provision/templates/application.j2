@@ -1,0 +1,17 @@
+# JDBC Configuration (MySQL)
+jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://{{ mysql_ip }}:3306/{{ db_name }}?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+jdbc.username={{ db_user }}
+jdbc.password={{ db_pass }}
+
+# Memcached Configuration
+memcached.active.host={{ memcache_ip }}
+memcached.active.port=11211
+memcached.standBy.host=127.0.0.2
+memcached.standBy.port=11211
+
+# RabbitMQ Configuration
+rabbitmq.address={{ rabbitmq_ip }}
+rabbitmq.port=5672
+rabbitmq.username={{ rmq_user }}
+rabbitmq.password={{ rmq_pass }}

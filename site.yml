@@ -36,4 +36,15 @@
     - ansible.builtin.import_tasks: roles/stack_provision/tasks/rabbitmq.yml
   handlers:
     - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml
+
+- name: Provision Tomcat
+  hosts: _tomcat
+  become: true
+  gather_facts: true
+  vars_files:
+    - roles/stack_provision/vars/main.yml
+  tasks:
+    - ansible.builtin.import_tasks: roles/stack_provision/tasks/tomcat.yml
+  handlers:
+    - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml
   

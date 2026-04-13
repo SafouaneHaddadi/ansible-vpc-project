@@ -1,0 +1,105 @@
+---
+- name: Fetch MySQL secrets from AWS Secrets Manager
+  set_fact:
+    db_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_pass }}"
+    db_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_user }}"
+    db_name: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/mysql', region=region) | from_json).db_name }}"
+
+- name: Fetch RabbitMQ secrets from AWS Secrets Manager
+  set_fact:
+    rmq_pass: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_pass }}"
+    rmq_user: "{{ (lookup('amazon.aws.secretsmanager_secret', 'dev/vprofile/rabbitmq', region=region) | from_json).rmq_user }}"
+
+- name: Get MySQL, Memcached, RabbitMQ private IPs from SSM
+  set_fact:
+    mysql_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/mysql_ip', region=region) }}"
+    memcache_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/memcache_ip', region=region) }}"
+    rabbitmq_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/rabbitmq_ip', region=region) }}"
+
+- name: Install Java JDK 
+  ansible.builtin.apt:
+    name: default-jdk
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Create tomcat system group
+  ansible.builtin.group:
+    name: tomcat
+    state: present
+  become: true
+
+- name: Create tomcat system user
+  ansible.builtin.user:
+    name: tomcat
+    group: tomcat
+    home: "{{ tomcat_home }}"
+    shell: /bin/false 
+    system: true 
+  become: true
+
+- name: Create Tomcat home directory 
+  ansible.builtin.file:
+    path: "{{ tomcat_home }}"
+    state: directory
+    owner: tomcat
+    group: tomcat
+    mode: '0755'
+  become: true
+
+- name: Download Tomcat binary 
+  ansible.builtin.get_url:
+    url: "{{ tomcat_url }}"
+    dest: /tmp/tomcat.tar.gz
+    mode: '0644'
+  become: true
+
+- name: Extract Tomcat archive
+  ansible.builtin.unarchive:
+    src: /tmp/tomcat.tar.gz
+    dest: "{{ tomcat_home }}"
+    remote_src: true
+    extra_opts: [--strip-components=1] 
+    owner: tomcat
+    group: tomcat
+  become: true
+
+- name: Create systemd service file for Tomcat 
+  ansible.builtin.template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+    mode: '0644'
+  become: true
+  notify: restart tomcat
+
+- name: Reload systemd daemon 
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Start and enable Tomcat
+  ansible.builtin.service:
+    name: tomcat
+    state: started
+    enabled: yes
+  become: true
+
+- name: Deploy application properties from template 
+  ansible.builtin.template:
+    src: application.j2
+    dest: "{{ tomcat_home }}/webapps/ROOT/WEB-INF/classes/application.properties"
+    mode: '0644'
+    owner: tomcat
+    group: tomcat
+  become: true
+  notify: restart tomcat
+
+- name: Deploy ROOT.war artifact 
+  ansible.builtin.copy:
+    src: "{{ artifact_staging_dir }}/{{ artifact_name }}"
+    dest: "{{ tomcat_home }}/webapps/ROOT.war"
+    owner: tomcat
+    group: tomcat
+    mode: '0644'
+  become: true
+  notify: restart tomcat
