@@ -12,7 +12,16 @@
     regexp: '^-d$'
     state: absent
   become: true
-  
+
+- name: Kill any existing memcached process on port 11211
+  ansible.builtin.shell: |
+    set -o pipefail
+    kill -9 $(lsof -t -i :11211) 2>/dev/null || true
+  args:
+    executable: /bin/bash
+  become: true
+  changed_when: fals
+
 - name: Start and enable Memcached
   ansible.builtin.service:
     name: memcached
