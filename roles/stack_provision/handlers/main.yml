@@ -11,7 +11,7 @@
     state: restarted
   become: true
 
-- name: restart rabbitmq
+- name: restart rabbitmq 
   ansible.builtin.service:
     name: rabbitmq-server
     state: restarted
@@ -20,5 +20,11 @@
 - name: restart tomcat
   ansible.builtin.service:
     name: tomcat
+    state: restarted
+  become: true
+
+- name: restart nginx
+  ansible.builtin.service:
+    name: nginx
     state: restarted
   become: true

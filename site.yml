@@ -48,3 +48,11 @@
   handlers:
     - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml
   
+- name: Provision Nginx
+  hosts: _nginx
+  become: true
+  gather_facts: true
+  tasks:
+    - ansible.builtin.import_tasks: roles/stack_provision/tasks/nginx.yml
+  handlers:
+    - ansible.builtin.import_tasks: roles/stack_provision/handlers/main.yml

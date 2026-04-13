@@ -1,0 +1,41 @@
+---
+- name: Get Tomcat private IP from SSM
+  set_fact:
+    tomcat_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/tomcat_ip', region=region) }}"
+
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Start and enable Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: true
+
+- name: Remove default Nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: true
+  notify: restart nginx
+
+- name: Deploy vprofile Nginx vhost config
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/roles/stack_provision/templates/nginxvpro.j2"
+    dest: /etc/nginx/sites-available/vproapp
+    mode: '0644'
+  become: true
+  notify: restart nginx
+
+- name: Enable vproapp site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/vproapp
+    dest: /etc/nginx/sites-enabled/vproapp
+    state: link
+  become: true
+  notify: restart nginx
