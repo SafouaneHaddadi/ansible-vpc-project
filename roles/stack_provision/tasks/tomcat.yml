@@ -64,22 +64,15 @@
     group: tomcat
   become: true
 
-- name: Download MySQL Connector/J (JDBC driver) for MySQL 8
+- name: Download MySQL Connector/J directly to Tomcat lib
   ansible.builtin.get_url:
     url: "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar"
-    dest: /tmp/mysql-connector.jar
-    mode: '0644'
-  become: true
-
-- name: Copy MySQL driver to Tomcat lib directory
-  ansible.builtin.copy:
-    src: /tmp/mysql-connector.jar
     dest: "{{ tomcat_home }}/lib/mysql-connector.jar"
     owner: tomcat
     group: tomcat
     mode: '0644'
   become: true
-  
+
 - name: Create systemd service file for Tomcat
   ansible.builtin.template:
     src: "{{ playbook_dir }}/roles/stack_provision/templates/tomcat.service.j2"
