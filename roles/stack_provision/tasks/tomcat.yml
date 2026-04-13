@@ -16,9 +16,9 @@
     memcache_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/memcache_ip', region=region) }}"
     rabbitmq_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/rabbitmq_ip', region=region) }}"
 
-- name: Install Java 11 (vprofile app requires Java 11, not 17)
+- name: Install Java 8 (required for vprofile app compatibility)
   ansible.builtin.apt:
-    name: openjdk-11-jdk
+    name: openjdk-8-jdk
     state: present
     update_cache: yes
   become: true
@@ -75,6 +75,12 @@
 - name: Reload systemd daemon 
   ansible.builtin.systemd:
     daemon_reload: true
+  become: true
+
+- name: Remove existing ROOT directory to force fresh deployment
+  ansible.builtin.file:
+    path: "{{ tomcat_home }}/webapps/ROOT"
+    state: absent
   become: true
 
 - name: Deploy ROOT.war artifact 

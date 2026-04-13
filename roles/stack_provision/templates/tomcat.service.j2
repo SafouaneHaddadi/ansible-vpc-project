@@ -6,7 +6,7 @@ After=network.target
 Type=forking
 User=tomcat
 Group=tomcat
-Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 Environment=CATALINA_HOME={{ tomcat_home }}
 ExecStart={{ tomcat_home }}/bin/startup.sh
 ExecStop={{ tomcat_home }}/bin/shutdown.sh
