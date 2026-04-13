@@ -16,9 +16,9 @@
     memcache_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/memcache_ip', region=region) }}"
     rabbitmq_ip: "{{ lookup('amazon.aws.aws_ssm', '/vprofile/dev/compute/rabbitmq_ip', region=region) }}"
 
-- name: Install Java JDK 
+- name: Install Java 11 (vprofile app requires Java 11, not 17)
   ansible.builtin.apt:
-    name: default-jdk
+    name: openjdk-11-jdk
     state: present
     update_cache: yes
   become: true
