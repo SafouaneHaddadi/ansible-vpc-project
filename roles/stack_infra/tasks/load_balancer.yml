@@ -39,25 +39,28 @@
   register: target_group
 
 # CREATE APPLICATION LOAD BALANCER 
-- name: Create Application Load Balancer
+- name: Update ALB with HTTPS listener and HTTP redirect
   amazon.aws.elb_application_lb:
     name: "{{ alb_name }}"
     region: "{{ region }}"
-    state: present
-    scheme: internet-facing
-    subnets: "{{ public_subnet_ids }}"
-    security_groups:
-      - "{{ alb_sg_id }}"
     listeners:
       - Protocol: HTTP
         Port: 80
         DefaultActions:
-          - Type: forward
-            TargetGroupName: "{{ target_group_name }}"
-    tags:
-      Name: "{{ alb_name }}"
-      Environment: "{{ env }}"
-      ManagedBy: ansible
+          - Type: redirect # any HTTP traffic to the ALB will be automatically redirected to HTTPS
+            RedirectConfig:
+              Protocol: HTTPS
+              Port: 443
+              StatusCode: HTTP_301 
+      - Protocol: HTTPS 
+        Port: 443
+        DefaultActions:
+          - Type: forward 
+            TargetGroupName: "{{ target_group_name }}" # the ALB will forward incoming HTTPS traffic to the Nginx instance
+        Certificates:
+          - CertificateArn: "arn:aws:acm:us-east-1:039612873733:certificate/ea8f84af-8735-4418-900f-e27af5735db6"
+        SslPolicy: "ELBSecurityPolicy-TLS-1-2-Ext-2018-06" 
+    state: present
   register: alb
 
 - name: Store ALB DNS name in SSM
