@@ -14,6 +14,7 @@
       - libmysqlclient-dev
     state: present
     update_cache: yes
+    timeout: 600 
   become: true
 
 - name: Start and enable MySQL service
